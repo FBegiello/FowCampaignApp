@@ -1,8 +1,4 @@
-﻿#region
-
-using FowCampaign.Api.Modules.Database.Entities.User;
-
-#endregion
+﻿using FowCampaign.Api.Modules.Database.Entities.User;
 
 namespace FowCampaign.Api.Modules.Database.Repositories;
 

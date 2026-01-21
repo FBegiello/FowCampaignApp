@@ -1,6 +1,4 @@
-﻿#region
-
-using System.Text.Json;
+﻿using System.Text.Json;
 using FowCampaign.Api.DTO;
 using FowCampaign.Api.Modules.Database;
 using FowCampaign.Api.Modules.Database.Entities.Campaign;
@@ -9,8 +7,6 @@ using FowCampaign.App.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-#endregion
 
 namespace FowCampaign.Api.Controllers;
 
@@ -257,7 +253,7 @@ public class CampaignController : ControllerBase
         var username = User.Identity?.Name;
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user == null) return Unauthorized();
-
+        
         var campaign = await _context.Campaigns.FirstOrDefaultAsync(c => c.Id == id);
         if (campaign == null) return NotFound("Campaign Not Found");
         if (campaign.OwnerId != user.Id) return Forbid("Only the campaign owner can delete the campaign.");

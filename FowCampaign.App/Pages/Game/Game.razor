@@ -333,6 +333,7 @@
 
         try
         {
+
             var realCoords = await JS.InvokeAsync<PaintCoord>(
                 "mapTools.getSize",
                 e.OffsetX,
@@ -345,7 +346,7 @@
             }
 
             ZoneSeedDto currentRegion = null;
-            var distanceMin = double.MaxValue;
+            var distanceMin = Double.MaxValue;
 
             foreach (var region in _state.Zones)
             {

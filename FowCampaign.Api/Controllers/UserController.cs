@@ -1,6 +1,4 @@
-﻿#region
-
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using FluentValidation;
@@ -11,8 +9,6 @@ using FowCampaign.Api.Modules.Database.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
-#endregion
-
 namespace FowCampaign.Api.Controllers;
 
 [ApiController]
@@ -20,7 +16,7 @@ namespace FowCampaign.Api.Controllers;
 public class UserController(
     IUserRepository userRepository,
     PasswordHash passwordHash,
-    IConfiguration configuration,
+    IConfiguration configuration, 
     IValidator<RegisterDto> validator
 ) : ControllerBase
 {
@@ -113,7 +109,7 @@ public class UserController(
         };
 
         var token = new JwtSecurityToken(
-            configuration["Jwt:Issuer"],
+            configuration["Jwt:Issuer"], 
             configuration["Jwt:Audience"],
             claims,
             expires: DateTime.Now.AddHours(24),

@@ -1,10 +1,6 @@
-﻿#region
-
-using FowCampaign.Api.Modules.Database.Entities.User;
+﻿using FowCampaign.Api.Modules.Database.Entities.User;
 using FowCampaign.Api.Modules.Database.Repositories;
 using Microsoft.AspNetCore.Components;
-
-#endregion
 
 namespace FowCampaign.Api.Modules.Account;
 

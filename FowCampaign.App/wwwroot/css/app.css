@@ -573,6 +573,7 @@ canvas {
 }
 
 
+
 .game-container {
     display: flex;
     height: calc(100% - 60px);
@@ -741,6 +742,7 @@ canvas {
 }
 
 
+
 .paper-sheet-container {
     pointer-events: auto;
     z-index: 100;
@@ -803,7 +805,6 @@ canvas {
     background-color: #b71c1c;
     animation: scan-animation 1s linear infinite;
 }
-
 @keyframes scan-animation {
     0% {
         left: -30%;

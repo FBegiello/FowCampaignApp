@@ -1,5 +1,3 @@
-#region
-
 using System.Text;
 using FluentValidation;
 using FowCampaign.Api.Modules.Account;
@@ -10,8 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
-
-#endregion
 
 var builder = WebApplication.CreateBuilder(args);
 
