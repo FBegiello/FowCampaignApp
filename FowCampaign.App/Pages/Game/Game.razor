@@ -1,4 +1,5 @@
 ﻿@page "/game/{Id:int}"
+@using System.Globalization
 @using System.Text.Json
 @using FowCampaign.App.DTO
 @using FowCampaign.App.Shared
@@ -38,7 +39,7 @@
     {
         @if (_state != null)
         {
-            <div class="turn-banner" style="background-color: @GetFactionColor(_state.CurrentTurnFaction);">
+            <div class="turn-banner" style="background-color: @(_ = GetFactionColor(_state.CurrentTurnFaction).Result);">
                 TURN @(_state.TurnNumber): @(_state.CurrentTurnFaction.ToUpper())
             </div>
         }
@@ -84,7 +85,7 @@
                             var topPercent = (unit.Y / _mapRealHeight) * 100.0;
 
                             var factionColor = GetFactionColor(unit.FactionName);
-                            var positionStyle = $"left: {leftPercent.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}%; top: {topPercent.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}%; border: 2px solid {factionColor}; box-shadow: 0 0 5px {factionColor};";
+                            var positionStyle = $"left: {leftPercent.ToString("F2", CultureInfo.InvariantCulture)}%; top: {topPercent.ToString("F2", CultureInfo.InvariantCulture)}%; border: 2px solid {factionColor}; box-shadow: 0 0 5px {factionColor};";
 
 
                             if (def != null)
@@ -175,23 +176,44 @@
 
                     @foreach (var faction in _battleUnits.Select(u => u.FactionName).Distinct())
                     {
-                    <div class="battle-faction-row">
-                        <div class="battle-faction-label"
-                             style="border-left: 3px solid @GetFactionColor(faction); padding-left: 6px;">
-                            @faction.ToUpper()
-                        </div>
-                        <div class="battle-points-row">
-                            <label class="battle-points-label">MAJOR VP</label>
-                            <input type="number" class="tactical-input battle-input" min="0"
-                                   value="@_majorPoints[faction]"
-                                   @onchange="e => _majorPoints[faction] = int.TryParse(e.Value?.ToString(), out var v) ? v : 0" />
+                        <div class="battle-faction-row vintage-counter-box">
+                            <div class="battle-faction-label faction-stamp"
+                                 style="border-color: @GetFactionColor(faction); color: @GetFactionColor(faction);">
+                                @faction.ToUpper()
+                            </div>
 
-                            <label class="battle-points-label">MINOR VP</label>
-                            <input type="number" class="tactical-input battle-input" min="0"
-                                   value="@_minorPoints[faction]"
-                                   @onchange="e => _minorPoints[faction] = int.TryParse(e.Value?.ToString(), out var v) ? v : 0" />
+                            <div class="battle-points-row counter-grid">
+                                <div class="counter-field">
+                                    <label class="battle-points-label typewriter-label">MAJOR VP</label>
+                                    <div class="mechanical-slot">
+                                        <div class="slot-shading"></div>
+                
+                                        <input type="number" class="hidden-interactive-input" min="0"
+                                               value="@_majorPoints[faction]"
+                                               @oninput="e => _majorPoints[faction] = int.TryParse(e.Value?.ToString(), out var v) ? v : 0" />
+                
+                                        <div class="rolling-number" @key="_majorPoints[faction]">
+                                            @_majorPoints[faction]
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="counter-field">
+                                    <label class="battle-points-label typewriter-label">MINOR VP</label>
+                                    <div class="mechanical-slot">
+                                        <div class="slot-shading"></div>
+                
+                                        <input type="number" class="hidden-interactive-input" min="0"
+                                               value="@_minorPoints[faction]"
+                                               @oninput="e => _minorPoints[faction] = int.TryParse(e.Value?.ToString(), out var v) ? v : 0" />
+                
+                                        <div class="rolling-number" @key="_minorPoints[faction]">
+                                            @_minorPoints[faction]
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
                     }
 
                     <div class="battle-removal-section">

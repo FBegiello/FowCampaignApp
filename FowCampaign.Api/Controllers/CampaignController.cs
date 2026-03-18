@@ -269,7 +269,7 @@ public class CampaignController : ControllerBase
         var username = User.Identity?.Name;
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user == null) return Unauthorized();
-        
+
         var campaign = await _context.Campaigns
             .Include(c => c.Players)
             .FirstOrDefaultAsync(c => c.Id == id);
@@ -278,21 +278,23 @@ public class CampaignController : ControllerBase
         {
             return NotFound("Campaign Not Found");
         }
-        
+
         var playerRecord = campaign.Players.FirstOrDefault(p => p.UserId == user.Id);
         if (playerRecord is null)
         {
             return Unauthorized("You are not a member of this campaign");
-        }
-
-        var battleJson = JsonSerializer.Serialize(new
-        {
-            battleResultDto.MajorPoints,
-            battleResultDto.MinorPoints,
-            battleResultDto.EliminatedUnitInfo
+        } 
+        
+        var battleJson = JsonSerializer.Serialize(new 
+        { 
+            battleResultDto.MajorPoints, 
+            battleResultDto.MinorPoints, 
+            battleResultDto.EliminatedUnitInfo,
+            
         });
+        
 
-        var newLog = new BattleLog
+         var newLog = new BattleLog
         {
             CampaignId = campaign.Id,
             ZoneName = battleResultDto.ZoneName,
