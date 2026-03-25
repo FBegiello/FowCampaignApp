@@ -20,9 +20,14 @@ builder.Services.AddSwaggerGen(options =>
     }
 );
 
-builder.Services.AddDbContext<FowCampaignContext>(options =>
+// Added env configurable db path for setup
+builder.Services.AddDbContext<CampaignDbContext>(options =>
 {
-    options.UseSqlite("Data Source=campaign.db");
+    var connectionString =
+        builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? "Data Source=campaign.db";
+
+    options.UseSqlite(connectionString);
     options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
 });
 
