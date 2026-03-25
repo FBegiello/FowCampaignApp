@@ -3,7 +3,7 @@ using FowCampaign.Api.DTO;
 
 namespace FowCampaign.Api.Modules.Account;
 
-public class RegisterValidator : AbstractValidator<RegisterDto>
+public class RegisterValidator : AbstractValidator<RegisterApiDto>
 {
     public RegisterValidator()
     {
@@ -16,7 +16,7 @@ public class RegisterValidator : AbstractValidator<RegisterDto>
             .NotEmpty().WithMessage("Password is required.")
             .MinimumLength(6).WithMessage("Password must be at least 6 characters long.")
             .MaximumLength(100).WithMessage("Password must not exceed 100 characters.");
-        
+
         RuleFor(x => x.ConfirmPassword)
             .Equal(x => x.Password).WithMessage("Passwords do not match.");
     }

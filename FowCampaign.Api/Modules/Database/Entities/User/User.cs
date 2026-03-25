@@ -9,7 +9,6 @@ public class User
     public string Password { get; set; }
 
 
-
     public virtual ICollection<Territory> Territories { get; set; } = new List<Territory>();
 
     public virtual ICollection<CampaignPlayer> CampaignsPlayed { get; set; } = new List<CampaignPlayer>();

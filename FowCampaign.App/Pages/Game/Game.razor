@@ -38,11 +38,11 @@
     }
     else
     {
-        @if (_state != null)
+        @if (_stateApp != null)
         {
             <div class="turn-banner"
-                 style="background-color: @(_ = GetFactionColor(_state.CurrentTurnFaction).Result);">
-                TURN @(_state.TurnNumber): @(_state.CurrentTurnFaction.ToUpper())
+                 style="background-color: @(_ = GetFactionColor(_stateApp.CurrentTurnFaction).Result);">
+                TURN @(_stateApp.TurnNumber): @(_stateApp.CurrentTurnFaction.ToUpper())
             </div>
         }
 
@@ -51,8 +51,8 @@
             <div class="map-panel">
 
                 <div class="map-sticky-header">
-                    <span>OP: @_gameData.Name</span>
-                    <span>Playing As: <span style="color:yellow;">@_gameData.MyFactionName</span></span>
+                    <span>OP: @_gameDataApp.Name</span>
+                    <span>Playing As: <span style="color:yellow;">@_gameDataApp.MyFactionName</span></span>
                 </div>
 
                 <div class="canvas-container" style="position: relative; width: fit-content; height: fit-content;"
@@ -71,20 +71,20 @@
                             </div>
                         </div>
                     }
-                    @if (_state != null)
+                    @if (_stateApp != null)
                     {
-                        @foreach (var unit in _state.Units)
+                        @foreach (var unit in _stateApp.Units)
                         {
-                            var def = _state.UnitDefinitions.FirstOrDefault(d => d.Id == unit.DefinitionId);
+                            var def = _stateApp.UnitDefinitions.FirstOrDefault(d => d.Id == unit.DefinitionId);
 
-                            var isMyUnit = unit.FactionName == _gameData.MyFactionName;
-                            var isMyTurn = _state.CurrentTurnFaction == _gameData.MyFactionName;
+                            var isMyUnit = unit.FactionName == _gameDataApp.MyFactionName;
+                            var isMyTurn = _stateApp.CurrentTurnFaction == _gameDataApp.MyFactionName;
                             var canDrag = isMyUnit && isMyTurn;
 
                             var dragClass = canDrag ? "unit-draggable" : "unit-locked";
-                            var pointerClass = _draggingUnit != null ? "pointer-events-none" : "";
-                            var leftPercent = (unit.X / _mapRealWidth) * 100.0;
-                            var topPercent = (unit.Y / _mapRealHeight) * 100.0;
+                            var pointerClass = _draggingUnitApp != null ? "pointer-events-none" : "";
+                            var leftPercent = unit.X / _mapRealWidth * 100.0;
+                            var topPercent = unit.Y / _mapRealHeight * 100.0;
 
                             var factionColor = GetFactionColor(unit.FactionName);
                             var positionStyle = $"left: {leftPercent.ToString("F2", CultureInfo.InvariantCulture)}%; top: {topPercent.ToString("F2", CultureInfo.InvariantCulture)}%; border: 2px solid {factionColor}; box-shadow: 0 0 5px {factionColor};";
@@ -113,7 +113,7 @@
                 <div class="sidebar-section">
                     <h4 class="section-header">COMMAND</h4>
 
-                    @if (_state?.CurrentTurnFaction == _gameData?.MyFactionName)
+                    @if (_stateApp?.CurrentTurnFaction == _gameDataApp?.MyFactionName)
                     {
                         <button class="btn-full btn-open-roster" @onclick="() => _showRosterModal = true">
                             OPEN UNIT ROSTER
@@ -136,7 +136,7 @@
                                 <div class="deployment-panel">
                                     <select @bind="_selectedDeployDefId" class="tactical-input-white mb-10">
                                         <option value="">-- Select Unit Type --</option>
-                                        @foreach (var def in _state.UnitDefinitions)
+                                        @foreach (var def in _stateApp.UnitDefinitions)
                                         {
                                             <option value="@def.Id">@def.Name</option>
                                         }
@@ -181,7 +181,7 @@
                     }
                 </div>
 
-                @if (_state?.CurrentTurnFaction == _gameData?.MyFactionName
+                @if (_stateApp?.CurrentTurnFaction == _gameDataApp?.MyFactionName
                      && _turnPhase == TurnPhase.Planning
                      && _battleAvailable)
                 {
@@ -246,12 +246,12 @@
                             <label class="battle-points-label typewriter-label"
                                    style="margin-bottom: 10px; display: block;">TACTICAL INTEL (EXCEL)</label>
 
-                            @if (_editingUnit == null)
+                            @if (_editingUnitApp == null)
                             {
                                 <div class="intel-roster" style="display: flex; flex-direction: column; gap: 5px;">
                                     @foreach (var u in _battleUnits)
                                     {
-                                        var def = _state.UnitDefinitions.FirstOrDefault(d => d.Id == u.DefinitionId);
+                                        var def = _stateApp.UnitDefinitions.FirstOrDefault(d => d.Id == u.DefinitionId);
                                         <button class="btn-full"
                                                 style="background-color: #2e7d32; color: white; text-align: left; padding: 10px;"
                                                 @onclick="() => OpenExcelEditor(u)">
@@ -266,7 +266,7 @@
                                      style="background: #1e1e1e; padding: 10px; border: 1px solid #444; margin-top: 10px;">
                                     <div
                                         style="color: #4caf50; font-family: 'Courier New'; margin-bottom: 10px; font-weight: bold;">
-                                        EDITING: @_state.UnitDefinitions.FirstOrDefault(d => d.Id == _editingUnit.DefinitionId)?.Name
+                                        EDITING: @_stateApp.UnitDefinitions.FirstOrDefault(d => d.Id == _editingUnitApp.DefinitionId)?.Name
                                     </div>
 
                                     <div style="overflow-x: auto; margin-bottom: 10px;">
@@ -334,9 +334,9 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @if (_state != null && _state.Zones != null)
+                        @if (_stateApp != null && _stateApp.Zones != null)
                         {
-                            @foreach (var zone in _state.Zones.OrderBy(z => z.Name))
+                            @foreach (var zone in _stateApp.Zones.OrderBy(z => z.Name))
                             {
                                 <tr class="intel-row">
                                     <td style="font-weight: bold; color: #333;">
@@ -373,8 +373,8 @@
 
             <div class="roster-modal-header">
                 <h2 class="roster-modal-title">
-                    <span style="color: @GetFactionColor(_gameData.MyFactionName).Result;">
-                        @_gameData.MyFactionName.ToUpper()
+                    <span style="color: @GetFactionColor(_gameDataApp.MyFactionName).Result;">
+                        @_gameDataApp.MyFactionName.ToUpper()
                     </span> TACTICAL ROSTER
                 </h2>
                 <button class="btn-close-modal" @onclick="CloseRosterModal">
@@ -382,7 +382,7 @@
                 </button>
             </div>
 
-            @if (_editingUnit == null)
+            @if (_editingUnitApp == null)
             {
                 <table class="roster-table">
                     <thead>
@@ -394,9 +394,9 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach (var u in _state.Units.Where(x => x.FactionName == _gameData.MyFactionName))
+                    @foreach (var u in _stateApp.Units.Where(x => x.FactionName == _gameDataApp.MyFactionName))
                     {
-                        var def = _state.UnitDefinitions.FirstOrDefault(d => d.Id == u.DefinitionId);
+                        var def = _stateApp.UnitDefinitions.FirstOrDefault(d => d.Id == u.DefinitionId);
                         <tr class="roster-table-row">
                             <td>
                                 @if (def != null)
@@ -425,7 +425,7 @@
             {
                 <div class="excel-editor-container">
                     <h3 class="excel-editor-title">
-                        EDITING: @_state.UnitDefinitions.FirstOrDefault(d => d.Id == _editingUnit.DefinitionId)?.Name
+                        EDITING: @_stateApp.UnitDefinitions.FirstOrDefault(d => d.Id == _editingUnitApp.DefinitionId)?.Name
                     </h3>
 
                     <div class="excel-table-wrapper">
@@ -467,25 +467,28 @@
 @code {
     [Parameter] public int Id { get; set; }
     private PaperSheet _paper;
-    private LoadGameDataDto _gameData;
-    private GameStateDto _state;
-    private UnitDto _draggingUnit;
-    private bool _isProcessingMap = false;
+    private LoadGameDataAppDto _gameDataApp;
+    private GameStateAppDto _stateApp;
+    private UnitAppDto _draggingUnitApp;
+    private bool _isProcessingMap;
     private bool _battleAvailable;
     private bool _showBattlePanel;
     private string _battleZoneName;
-    private ZoneSeedDto _battleZone;
-    private List<UnitDto> _battleUnits = [];
+    private ZoneSeedAppDto _battleZone;
+    private List<UnitAppDto> _battleUnits = [];
     private double _mapRealWidth = 1;
     private double _mapRealHeight = 1;
     private double _dragScaleFactor = 1.0;
 
-    private Dictionary<string, int> _majorPoints = new();
-    private Dictionary<string, int> _minorPoints = new();
+    private readonly Dictionary<string, int> _majorPoints = new();
+    private readonly Dictionary<string, int> _minorPoints = new();
 
     private string _unitToRemoveId;
 
-    private static string UnitUiKey(UnitDto u) => $"{u.FactionName}|{u.DefinitionId}|{u.X}|{u.Y}";
+    private static string UnitUiKey(UnitAppDto u)
+    {
+        return $"{u.FactionName}|{u.DefinitionId}|{u.X}|{u.Y}";
+    }
 
 
     private enum TurnPhase
@@ -501,7 +504,7 @@
     private bool _loadError;
     private bool _mapRendered;
 
-    private UnitDto _editingUnit;
+    private UnitAppDto _editingUnitApp;
     private List<List<string>> _activeExcelGrid = new();
     private byte[] _originalExcelBytes;
     private bool _showRosterModal;
@@ -513,16 +516,16 @@
     {
         try
         {
-            _gameData = await Http.GetFromJsonAsync<LoadGameDataDto>($"api/Campaign/{Id}");
+            _gameDataApp = await Http.GetFromJsonAsync<LoadGameDataAppDto>($"api/Campaign/{Id}");
 
-            if (!string.IsNullOrEmpty(_gameData.GameStateJson))
+            if (!string.IsNullOrEmpty(_gameDataApp.GameStateJson))
             {
-                _state = JsonSerializer.Deserialize<GameStateDto>(_gameData.GameStateJson);
+                _stateApp = JsonSerializer.Deserialize<GameStateAppDto>(_gameDataApp.GameStateJson);
 
-                if (string.IsNullOrEmpty(_state.CurrentTurnFaction))
+                if (string.IsNullOrEmpty(_stateApp.CurrentTurnFaction))
                 {
-                    _state.CurrentTurnFaction = _state.Factions.FirstOrDefault()?.Name ?? "Axis";
-                    _state.TurnNumber = 1;
+                    _stateApp.CurrentTurnFaction = _stateApp.Factions.FirstOrDefault()?.Name ?? "Axis";
+                    _stateApp.TurnNumber = 1;
                 }
             }
         }
@@ -539,18 +542,18 @@
 
     private async Task<string> GetFactionColor(string factionName)
     {
-        return _state?.Factions.FirstOrDefault(f => f.Name == factionName)?.Color ?? "#000000";
+        return _stateApp?.Factions.FirstOrDefault(f => f.Name == factionName)?.Color ?? "#000000";
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!_isLoading && !_loadError && !_mapRendered && _gameData != null)
+        if (!_isLoading && !_loadError && !_mapRendered && _gameDataApp != null)
         {
             _mapRendered = true;
 
             try
             {
-                var dims = await JS.InvokeAsync<MapDimensions>("mapTools.initMap", "gameCanvas", _gameData.MapImageBase64);
+                var dims = await JS.InvokeAsync<MapDimensions>("mapTools.initMap", "gameCanvas", _gameDataApp.MapImageBase64);
 
                 if (dims.Width > 0)
                 {
@@ -559,11 +562,11 @@
                     StateHasChanged();
                 }
 
-                if (_state != null)
+                if (_stateApp != null)
                 {
-                    foreach (var zone in _state.Zones)
+                    foreach (var zone in _stateApp.Zones)
                     {
-                        var f = _state.Factions.FirstOrDefault(fn => fn.Name == zone.FactionName);
+                        var f = _stateApp.Factions.FirstOrDefault(fn => fn.Name == zone.FactionName);
                         if (f != null) await JS.InvokeVoidAsync("mapTools.floodFillRaw", zone.X, zone.Y, f.Color);
                     }
                 }
@@ -576,17 +579,17 @@
     }
 
 
-    private async Task StartDrag(UnitDto unit)
+    private async Task StartDrag(UnitAppDto unitApp)
     {
         if (_turnPhase != TurnPhase.Planning)
         {
             return;
         }
 
-        if (unit.FactionName == _gameData.MyFactionName &&
-            _state.CurrentTurnFaction == _gameData.MyFactionName)
+        if (unitApp.FactionName == _gameDataApp.MyFactionName &&
+            _stateApp.CurrentTurnFaction == _gameDataApp.MyFactionName)
         {
-            _draggingUnit = unit;
+            _draggingUnitApp = unitApp;
 
             var visualDims = await JS.InvokeAsync<MapDimensions>("mapTools.getClientDimensions", "gameCanvas");
 
@@ -599,25 +602,25 @@
 
     private async Task HandleWrapperMouseMove(MouseEventArgs e)
     {
-        if (_draggingUnit != null)
+        if (_draggingUnitApp != null)
         {
-            _draggingUnit.X = e.OffsetX * _dragScaleFactor;
-            _draggingUnit.Y = e.OffsetY * _dragScaleFactor;
+            _draggingUnitApp.X = e.OffsetX * _dragScaleFactor;
+            _draggingUnitApp.Y = e.OffsetY * _dragScaleFactor;
         }
     }
 
     private async Task HandleWrapperMouseUp()
     {
-        _draggingUnit = null;
+        _draggingUnitApp = null;
         await RecalculateBattleAvailability();
     }
 
     private async Task SubmitTurn()
     {
-        var endTurnReqestDto = new EndTurnRequestDto
+        var endTurnReqestDto = new EndTurnRequestAppDto
         {
-            Units = _state.Units,
-            Zones = _state.Zones
+            Units = _stateApp.Units,
+            Zones = _stateApp.Zones
         };
         var response = await Http.PostAsJsonAsync($"api/Campaign/{Id}/turn", endTurnReqestDto);
         if (response.IsSuccessStatusCode)
@@ -628,9 +631,9 @@
 
     private async Task HandleMapClick(MouseEventArgs e)
     {
-        if (_state == null || _gameData == null || _isProcessingMap) return;
+        if (_stateApp == null || _gameDataApp == null || _isProcessingMap) return;
 
-        if (_state.CurrentTurnFaction != _gameData.MyFactionName)
+        if (_stateApp.CurrentTurnFaction != _gameDataApp.MyFactionName)
         {
             return;
         }
@@ -650,18 +653,18 @@
 
             if (realCoords is not null)
             {
-                var newUnit = new UnitDto
+                var newUnit = new UnitAppDto
                 {
                     Id = Guid.NewGuid().ToString(),
                     DefinitionId = _selectedDeployDefId,
-                    FactionName = _gameData.MyFactionName,
+                    FactionName = _gameDataApp.MyFactionName,
                     X = realCoords.X,
                     Y = realCoords.Y,
                     ExcelFileName = _pendingDeployExcelName,
                     ExcelDatabase64 = _pendingDeployExcelBase64
                 };
 
-                _state.Units.Add(newUnit);
+                _stateApp.Units.Add(newUnit);
 
                 _pendingDeployExcelBase64 = null;
                 _pendingDeployExcelName = null;
@@ -691,10 +694,10 @@
                 return;
             }
 
-            ZoneSeedDto currentRegion = null;
+            ZoneSeedAppDto currentRegion = null;
             var distanceMin = double.MaxValue;
 
-            foreach (var region in _state.Zones)
+            foreach (var region in _stateApp.Zones)
             {
                 var distanceX = realCoords.X - region.X;
                 var distanceY = realCoords.Y - region.Y;
@@ -714,14 +717,14 @@
             {
                 Console.WriteLine($"DEBUG: Trafiono region {currentRegion.Name}. Rozpoczynam kolorowanie...");
 
-                currentRegion.FactionName = _gameData.MyFactionName;
-                var myFactionColor = GetFactionColor(_gameData.MyFactionName);
+                currentRegion.FactionName = _gameDataApp.MyFactionName;
+                var myFactionColor = GetFactionColor(_gameDataApp.MyFactionName);
 
                 await JS.InvokeVoidAsync("mapTools.floodFillRaw", (int)currentRegion.X, (int)currentRegion.Y, myFactionColor);
 
-                _state.Zones = _state.Zones.Select(z =>
+                _stateApp.Zones = _stateApp.Zones.Select(z =>
                     z.X == currentRegion.X && z.Y == currentRegion.Y
-                        ? new ZoneSeedDto { X = z.X, Y = z.Y, FactionName = currentRegion.FactionName, Name = z.Name }
+                        ? new ZoneSeedAppDto { X = z.X, Y = z.Y, FactionName = currentRegion.FactionName, Name = z.Name }
                         : z
                 ).ToList();
             }
@@ -746,18 +749,18 @@
         _battleZoneName = string.Empty;
         _battleUnits.Clear();
 
-        if (_state == null)
+        if (_stateApp == null)
         {
             return;
         }
 
-        foreach (var zone in _state.Zones)
+        foreach (var zone in _stateApp.Zones)
         {
-            var unitsInZone = _state.Units.Where(u =>
+            var unitsInZone = _stateApp.Units.Where(u =>
                 {
                     var dx = u.X - zone.X;
                     var dy = u.Y - zone.Y;
-                    return (dx * dx + dy * dy) < (80 * 80);
+                    return dx * dx + dy * dy < 80 * 80;
                 })
                 .ToList();
 
@@ -797,15 +800,15 @@
 
     private async Task RemoveSelectedUnitIfAny()
     {
-        if (string.IsNullOrWhiteSpace(_unitToRemoveId) || _state == null)
+        if (string.IsNullOrWhiteSpace(_unitToRemoveId) || _stateApp == null)
         {
             return;
         }
 
-        var target = _state.Units.FirstOrDefault(u => UnitUiKey(u) == _unitToRemoveId);
+        var target = _stateApp.Units.FirstOrDefault(u => UnitUiKey(u) == _unitToRemoveId);
         if (target != null)
         {
-            _state.Units.Remove(target);
+            _stateApp.Units.Remove(target);
         }
 
         _unitToRemoveId = null;
@@ -813,7 +816,7 @@
 
     private async Task ConfirmBattleResults()
     {
-        if (_state == null || _battleZone == null)
+        if (_stateApp == null || _battleZone == null)
         {
             return;
         }
@@ -829,10 +832,10 @@
         }
 
 
-        var dto = new BattleResultDto
+        var dto = new BattleResultAppDto
         {
             ZoneName = _battleZoneName,
-            TurnNumber = _state.TurnNumber,
+            TurnNumber = _stateApp.TurnNumber,
             MajorPoints = _majorPoints,
             MinorPoints = _minorPoints,
             UpdatedUnitFiles = updatedFiles
@@ -853,16 +856,16 @@
     }
 
 
-    private async Task OpenExcelEditor(UnitDto unit)
+    private async Task OpenExcelEditor(UnitAppDto unitApp)
     {
-        _editingUnit = unit;
+        _editingUnitApp = unitApp;
         _activeExcelGrid = new List<List<string>>();
 
-        if (!string.IsNullOrWhiteSpace(unit.ExcelDatabase64))
+        if (!string.IsNullOrWhiteSpace(unitApp.ExcelDatabase64))
         {
             try
             {
-                _originalExcelBytes = Convert.FromBase64String(unit.ExcelDatabase64);
+                _originalExcelBytes = Convert.FromBase64String(unitApp.ExcelDatabase64);
                 using var stream = new MemoryStream(_originalExcelBytes);
                 using var workbook = new XLWorkbook(stream);
                 var worksheet = workbook.Worksheets.First();
@@ -925,7 +928,7 @@
 
     private void SaveExcelData()
     {
-        if (_editingUnit != null && _activeExcelGrid != null)
+        if (_editingUnitApp != null && _activeExcelGrid != null)
         {
             XLWorkbook workbook;
 
@@ -952,7 +955,7 @@
 
             using var outStream = new MemoryStream();
             workbook.SaveAs(outStream);
-            _editingUnit.ExcelDatabase64 = Convert.ToBase64String(outStream.ToArray());
+            _editingUnitApp.ExcelDatabase64 = Convert.ToBase64String(outStream.ToArray());
 
             CloseExcelEditor();
         }
@@ -960,7 +963,7 @@
 
     private void CloseExcelEditor()
     {
-        _editingUnit = null;
+        _editingUnitApp = null;
         _activeExcelGrid = null;
         _originalExcelBytes = null;
     }

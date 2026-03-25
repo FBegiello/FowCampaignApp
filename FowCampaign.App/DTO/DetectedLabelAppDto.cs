@@ -1,6 +1,6 @@
 ﻿namespace FowCampaign.App.DTO;
 
-public class DetectedLabelDto
+public class DetectedLabelAppDto
 {
     public string Text { get; set; }
     public double X { get; set; }

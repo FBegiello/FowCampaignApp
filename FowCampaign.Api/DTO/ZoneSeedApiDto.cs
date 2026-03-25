@@ -1,6 +1,6 @@
 ﻿namespace FowCampaign.App.DTO;
 
-public class ZoneSeedDto
+public class ZoneSeedApiDto
 {
     public double X { get; set; }
     public double Y { get; set; }

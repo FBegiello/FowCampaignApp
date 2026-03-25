@@ -1,6 +1,6 @@
 ﻿namespace FowCampaign.Api.DTO;
 
-public class CreateCampaignDto
+public class CreateCampaignApiDto
 {
     public string Name { get; set; }
     public IFormFile MapImage { get; set; }

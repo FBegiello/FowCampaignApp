@@ -1,8 +1,9 @@
 ﻿namespace FowCampaign.App.DTO;
 
-public class User
+public class RegisterAppDto
 {
-    public int Id { get; set; }
     public string Username { get; set; }
     public string Password { get; set; }
+
+    public string ConfirmPassword { get; set; }
 }

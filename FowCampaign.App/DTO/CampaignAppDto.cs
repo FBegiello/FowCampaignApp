@@ -1,6 +1,6 @@
 ﻿namespace FowCampaign.App.DTO;
 
-public class CampaignDto
+public class CampaignAppDto
 {
     public int Id { get; set; }
     public string Name { get; set; }

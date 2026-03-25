@@ -16,12 +16,12 @@ namespace FowCampaign.Api.Controllers;
 public class UserController(
     IUserRepository userRepository,
     PasswordHash passwordHash,
-    IConfiguration configuration, 
-    IValidator<RegisterDto> validator
+    IConfiguration configuration,
+    IValidator<RegisterApiDto> validator
 ) : ControllerBase
 {
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterDto user)
+    public async Task<IActionResult> Register([FromBody] RegisterApiDto user)
     {
         // validation is currently disabled as it is unnecessary now
         /*var validationResult = await validator.ValidateAsync(user);
@@ -48,7 +48,7 @@ public class UserController(
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto user)
+    public async Task<IActionResult> Login([FromBody] LoginApiDto user)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -110,7 +110,7 @@ public class UserController(
         };
 
         var token = new JwtSecurityToken(
-            configuration["Jwt:Issuer"], 
+            configuration["Jwt:Issuer"],
             configuration["Jwt:Audience"],
             claims,
             expires: DateTime.Now.AddHours(24),

@@ -1,6 +1,6 @@
 ﻿namespace FowCampaign.Api.DTO;
 
-public class CampaignDto
+public class CampaignApiDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;

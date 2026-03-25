@@ -7,10 +7,6 @@ using FowCampaign.App.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BattleResultDto = FowCampaign.Api.DTO.BattleResultDto;
-using CampaignDto = FowCampaign.Api.DTO.CampaignDto;
-using CreateCampaignDto = FowCampaign.Api.DTO.CreateCampaignDto;
-using LoadGameDataDto = FowCampaign.Api.DTO.LoadGameDataDto;
 
 namespace FowCampaign.Api.Controllers;
 
@@ -28,7 +24,7 @@ public class CampaignController : ControllerBase
 
 
     [HttpPost("create")]
-    public async Task<IActionResult> CreateCampaign([FromForm] CreateCampaignDto request)
+    public async Task<IActionResult> CreateCampaign([FromForm] CreateCampaignApiDto request)
     {
         var nameClaim = User.Identity?.Name;
         if (string.IsNullOrEmpty(nameClaim)) return Unauthorized();
@@ -90,7 +86,7 @@ public class CampaignController : ControllerBase
             .Include(c => c.Players)
             .Where(c => c.Players.Any(p => p.UserId == user.Id))
             .OrderByDescending(c => c.CreatedAt)
-            .Select(c => new CampaignDto
+            .Select(c => new CampaignApiDto
             {
                 Id = c.Id,
                 Name = c.Name,
@@ -103,7 +99,7 @@ public class CampaignController : ControllerBase
 
     [HttpGet("{id}")]
     [Authorize]
-    public async Task<ActionResult<LoadGameDataDto>> GetCampaign(int id)
+    public async Task<ActionResult<LoadGameDataApiDto>> GetCampaign(int id)
     {
         var username = User.Identity?.Name;
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
@@ -137,7 +133,7 @@ public class CampaignController : ControllerBase
                 Console.WriteLine($"Error reading map file: {ex.Message}");
             }
 
-        return Ok(new LoadGameDataDto
+        return Ok(new LoadGameDataApiDto
         {
             Id = campaign.Id,
             Name = campaign.Name,
@@ -150,7 +146,7 @@ public class CampaignController : ControllerBase
 
     [HttpPost("{Id}/turn")]
     [Authorize]
-    public async Task<IActionResult> EndTurn(int id, [FromBody] EndTurnRequestDto updatedUnits)
+    public async Task<IActionResult> EndTurn(int id, [FromBody] EndTurnRequestApiDto updatedUnits)
     {
         var username = User.Identity?.Name;
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
@@ -194,13 +190,13 @@ public class CampaignController : ControllerBase
 
     [HttpPost("join")]
     [Authorize]
-    public async Task<IActionResult> JoinCampaign([FromBody] JoinRequestDto joinRequestDto)
+    public async Task<IActionResult> JoinCampaign([FromBody] JoinRequestApiDto joinRequestApiDto)
     {
         var username = User.Identity?.Name;
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user == null) return Unauthorized();
 
-        var code = joinRequestDto.JoinCode.ToUpper().Trim();
+        var code = joinRequestApiDto.JoinCode.ToUpper().Trim();
         var campaign = await _context.Campaigns
             .Include(c => c.Players)
             .FirstOrDefaultAsync(c => c.JoinCode == code);
@@ -217,12 +213,12 @@ public class CampaignController : ControllerBase
         campaign.Players.Add(new CampaignPlayer
         {
             User = user,
-            FactionName = joinRequestDto.FactionName,
+            FactionName = joinRequestApiDto.FactionName,
             IsAlive = true,
             IsTurn = true
         });
         await _context.SaveChangesAsync();
-        return Ok(new JoinResult { campaignId = campaign.Id, message = "Welcome to the campaign, Commander." });
+        return Ok(new JoinResultApiDto { campaignId = campaign.Id, message = "Welcome to the campaign, Commander." });
     }
 
     [HttpGet("lookup/{code}")]
@@ -257,7 +253,7 @@ public class CampaignController : ControllerBase
         var username = User.Identity?.Name;
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user == null) return Unauthorized();
-        
+
         var campaign = await _context.Campaigns.FirstOrDefaultAsync(c => c.Id == id);
         if (campaign == null) return NotFound("Campaign Not Found");
         if (campaign.OwnerId != user.Id) return Forbid("Only the campaign owner can delete the campaign.");
@@ -268,7 +264,7 @@ public class CampaignController : ControllerBase
 
     [HttpPost("{id}/battle")]
     [Authorize]
-    public async Task<IActionResult> BattleResult(int id, [FromBody] BattleResultDto battleResultDto)
+    public async Task<IActionResult> BattleResult(int id, [FromBody] BattleResultApiDto battleResultApiDto)
     {
         var username = User.Identity?.Name;
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
@@ -278,41 +274,35 @@ public class CampaignController : ControllerBase
             .Include(c => c.Players)
             .FirstOrDefaultAsync(c => c.Id == id);
 
-        if (campaign is null)
-        {
-            return NotFound("Campaign Not Found");
-        }
+        if (campaign is null) return NotFound("Campaign Not Found");
 
         var playerRecord = campaign.Players.FirstOrDefault(p => p.UserId == user.Id);
-        if (playerRecord is null)
-        {
-            return Unauthorized("You are not a member of this campaign");
-        } 
-        
-        var battleJson = JsonSerializer.Serialize(new 
-        { 
-            battleResultDto.MajorPoints, 
-            battleResultDto.MinorPoints,
-            battleResultDto.UpdatedUnitFiles
-        });
-        
+        if (playerRecord is null) return Unauthorized("You are not a member of this campaign");
 
-         var newLog = new BattleLog
+        var battleJson = JsonSerializer.Serialize(new
+        {
+            battleResultApiDto.MajorPoints,
+            battleResultApiDto.MinorPoints,
+            battleResultApiDto.UpdatedUnitFiles
+        });
+
+
+        var newLog = new BattleLog
         {
             CampaignId = campaign.Id,
-            ZoneName = battleResultDto.ZoneName,
-            TurnNumber = battleResultDto.TurnNumber,
+            ZoneName = battleResultApiDto.ZoneName,
+            TurnNumber = battleResultApiDto.TurnNumber,
             ResultJson = battleJson,
             CreatedAt = DateTime.UtcNow
         };
-        
+
         _context.BattleLogs.Add(newLog);
 
 
         var state = JsonSerializer.Deserialize<GameStateDto>(campaign.GameStateJson);
-        if (state != null && battleResultDto.UpdatedUnitFiles.Any())
+        if (state != null && battleResultApiDto.UpdatedUnitFiles.Any())
         {
-            foreach (var unitFile in battleResultDto.UpdatedUnitFiles)
+            foreach (var unitFile in battleResultApiDto.UpdatedUnitFiles)
             {
                 var targetUnits = state.Units.FirstOrDefault(u => u.Id == unitFile.Key);
                 if (targetUnits != null) targetUnits.ExcelDatabase64 = unitFile.Value;
@@ -320,10 +310,9 @@ public class CampaignController : ControllerBase
 
             campaign.GameStateJson = JsonSerializer.Serialize(state);
         }
+
         await _context.SaveChangesAsync();
-        
+
         return Ok(new { message = "Battle logged successfully" });
-
-
     }
 }
