@@ -21,7 +21,7 @@ builder.Services.AddSwaggerGen(options =>
 );
 
 // Added env configurable db path for setup
-builder.Services.AddDbContext<CampaignDbContext>(options =>
+builder.Services.AddDbContext<FowCampaignContext>(options =>
 {
     var connectionString =
         builder.Configuration.GetConnectionString("DefaultConnection")
