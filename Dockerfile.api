@@ -1,8 +1,11 @@
 ﻿FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
+COPY ["global.json", "."]
 COPY ["FowCampaign.Api/FowCampaign.Api.csproj", "FowCampaign.Api/"]
 COPY ["FowCampaign.App/FowCampaign.App.csproj", "FowCampaign.App/"]
+
+RUN dotnet workload restore "FowCampaign.Api/FowCampaign.Api.csproj"
 RUN dotnet restore "FowCampaign.Api/FowCampaign.Api.csproj"
 
 COPY . .

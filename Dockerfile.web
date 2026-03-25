@@ -3,9 +3,13 @@ WORKDIR /src
 
 ARG API_BASE_URL
 
-RUN dotnet workload install wasm-tools
+RUN apt-get update && apt-get install -y python3 && rm -rf /var/lib/apt/lists/*
+RUN ln -sf /usr/bin/python3 /usr/bin/python
 
+COPY ["global.json", "."]
 COPY ["FowCampaign.App/FowCampaign.App.csproj", "FowCampaign.App/"]
+
+RUN dotnet workload restore "FowCampaign.App/FowCampaign.App.csproj"
 RUN dotnet restore "FowCampaign.App/FowCampaign.App.csproj"
 
 COPY . .
