@@ -136,7 +136,7 @@
 
 @code {
     private PaperSheet _paper;
-    private List<CampaignDto> _campaigns;
+    private List<CampaignAppDto> _campaigns;
     private string _username;
 
     private bool _showJoinModal;
@@ -145,7 +145,7 @@
     private string _joinError = "";
     private string _foundCampaignName;
     private List<string> _foundFactions = new();
-    private HashSet<int> _burningCampaigns = new();
+    private readonly HashSet<int> _burningCampaigns = new();
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -159,16 +159,16 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await Http.GetFromJsonAsync<UserSessionDto>("api/User/me");
+        var authState = await Http.GetFromJsonAsync<UserSessionAppDto>("api/User/me");
         _username = authState?.Username;
 
         try
         {
-            _campaigns = await Http.GetFromJsonAsync<List<CampaignDto>>("api/Campaign/GetCampaigns");
+            _campaigns = await Http.GetFromJsonAsync<List<CampaignAppDto>>("api/Campaign/GetCampaigns");
         }
         catch
         {
-            _campaigns = new List<CampaignDto>();
+            _campaigns = new List<CampaignAppDto>();
         }
     }
 
@@ -208,7 +208,7 @@
         var response = await Http.GetAsync($"api/Campaign/lookup/{_joinCode}");
         if (response.IsSuccessStatusCode)
         {
-            var result = await response.Content.ReadFromJsonAsync<CampaignPreviewDto>();
+            var result = await response.Content.ReadFromJsonAsync<CampaignPreviewAppDto>();
             _foundCampaignName = result.Name;
             _foundFactions = result.Factions;
             _joinStep = 2;
@@ -224,12 +224,12 @@
     {
         _joinError = "Enlisting...";
 
-        var request = new JoinRequestDto { JoinCode = _joinCode, FactionName = factionName };
+        var request = new JoinRequestAppDto { JoinCode = _joinCode, FactionName = factionName };
         var response = await Http.PostAsJsonAsync("api/Campaign/join", request);
         if (response.IsSuccessStatusCode)
         {
-            var result = new JoinResult();
-            result = await response.Content.ReadFromJsonAsync<JoinResult>();
+            var result = new JoinResultAppDto();
+            result = await response.Content.ReadFromJsonAsync<JoinResultAppDto>();
             await CloseModal();
             await _paper.TossAndNavigate($"/game/{result.campaignId}");
         }

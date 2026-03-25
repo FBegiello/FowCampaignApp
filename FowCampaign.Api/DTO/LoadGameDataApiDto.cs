@@ -1,6 +1,6 @@
-﻿namespace FowCampaign.App.DTO;
+﻿namespace FowCampaign.Api.DTO;
 
-public class LoadGameDataDto
+public class LoadGameDataApiDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;

@@ -16,6 +16,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
     };
 
     private AuthenticationState? _cachedAuthenticationState;
+
     public CustomAuthStateProvider(HttpClient httpClient)
     {
         _httpClient = httpClient;
@@ -31,7 +32,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 
             if (response.IsSuccessStatusCode)
             {
-                var userDto = await response.Content.ReadFromJsonAsync<UserSessionDto>(_jsonOptions);
+                var userDto = await response.Content.ReadFromJsonAsync<UserSessionAppDto>(_jsonOptions);
                 if (userDto != null && userDto.IsAuthenticated)
                 {
                     var claims = new List<Claim>
@@ -41,7 +42,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 
                     var identity = new ClaimsIdentity(claims, "Cookies");
                     var user = new ClaimsPrincipal(identity);
-                    
+
                     _cachedAuthenticationState = new AuthenticationState(user);
 
                     return _cachedAuthenticationState;
@@ -52,7 +53,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
         {
             Console.WriteLine(e);
         }
-        
+
         _cachedAuthenticationState = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
         return _cachedAuthenticationState;
@@ -62,13 +63,13 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
     {
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
-    
+
     public void NotifyLogOut()
     {
         _cachedAuthenticationState = null;
 
         var anonymousState = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
-        
+
         NotifyAuthenticationStateChanged(Task.FromResult(anonymousState));
     }
 }

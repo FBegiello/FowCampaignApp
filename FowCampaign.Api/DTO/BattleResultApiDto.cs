@@ -1,6 +1,6 @@
 namespace FowCampaign.Api.DTO;
 
-public class BattleResultDto
+public class BattleResultApiDto
 {
     public string ZoneName { get; set; }
     public int TurnNumber { get; set; }

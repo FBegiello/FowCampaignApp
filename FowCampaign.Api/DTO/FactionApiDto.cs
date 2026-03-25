@@ -1,6 +1,6 @@
 ﻿namespace FowCampaign.App.DTO;
 
-public class FactionDto
+public class FactionApiDto
 {
     public string Name { get; set; } = string.Empty;
     public string Color { get; set; } = "#000000";

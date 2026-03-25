@@ -16,8 +16,7 @@
     {
         try
         {
-            var userState = await Http.GetFromJsonAsync<User>("api/User/me");
-            
+            var userState = await Http.GetFromJsonAsync<UserAppDto>("api/User/me");
         }
         catch (HttpRequestException)
         {

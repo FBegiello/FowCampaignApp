@@ -87,7 +87,7 @@
                     }
                 </div>
                 @foreach (var def in _unitDefinitions)
-            {
+                {
                     <div @onclick="() => _selectedDefinitionId = def.Id"
                          style="cursor: pointer; padding: 5px; border: 2px solid @(_selectedDefinitionId == def.Id ? "#bd2424" : "transparent");">
                         <img src="@def.ImageBase64" style="width: 32px; height: 32px; display: block; margin: 0 auto;"/>
@@ -130,7 +130,7 @@
                     {
                         var factionColor = _model.Factions.FirstOrDefault(f => f.Name == unit.FactionName)?.Color ?? "#000";
                         var def = _unitDefinitions.FirstOrDefault(d => d.Id == unit.DefinitionId);
-                        var isBeingDragged = _draggingUnit == unit;
+                        var isBeingDragged = _draggingUnitApp == unit;
 
                         if (def != null)
                         {
@@ -179,10 +179,10 @@
 
                             <div class="faction-header-row">
                                 <div style="width:25px; height:25px; background:@faction.Color;
-                                border:2px solid @(_selectedFaction == faction ? "#000" : "#ddd");
-                                box-shadow: @(_selectedFaction == faction ? "0 0 5px #000" : "none");
+                                border:2px solid @(_selectedFactionApp == faction ? "#000" : "#ddd");
+                                box-shadow: @(_selectedFactionApp == faction ? "0 0 5px #000" : "none");
                                 cursor: pointer;"
-                                     @onclick="() => _selectedFaction = faction"
+                                     @onclick="() => _selectedFactionApp = faction"
                                      title="Select to Paint">
                                 </div>
 
@@ -204,8 +204,8 @@
 
                                 <label>
                                     <input type="checkbox" class="hidden-checkbox"
-                                           checked="@(_myFaction == faction)"
-                                           @onchange="() => _myFaction = faction"/>
+                                           checked="@(_myFactionApp == faction)"
+                                           @onchange="() => _myFactionApp = faction"/>
                                     <div class="stamp-option stamp-commander">
                                         <div class="stamp-badge"></div>
                                         <span>COMMAND</span>
@@ -214,8 +214,8 @@
 
                                 <label>
                                     <input type="checkbox" class="hidden-checkbox"
-                                           checked="@(_startingFaction == faction)"
-                                           @onchange="() => _startingFaction = faction"/>
+                                           checked="@(_startingFactionApp == faction)"
+                                           @onchange="() => _startingFactionApp = faction"/>
                                     <div class="stamp-option stamp-starter">
                                         <div class="stamp-badge"></div>
                                         <span>1ST TURN</span>
@@ -240,15 +240,15 @@
 
 @code {
     private PaperSheet _paper;
-    private readonly CreateCampaignDto _model = new();
-    private FactionDto _selectedFaction;
-    private FactionDto _myFaction;
-    private FactionDto _startingFaction;
-    private readonly List<ZoneSeedDto> _recordedZones = new();
-    private readonly List<UnitDefinitionDto> _unitDefinitions = new();
-    private readonly List<UnitDto> _deployedUnits = new();
-    private UnitDto _draggingUnit;
-    private List<DetectedLabelDto> _ocrLabels = new();
+    private readonly CreateCampaignAppDto _model = new();
+    private FactionAppDto _selectedFactionApp;
+    private FactionAppDto _myFactionApp;
+    private FactionAppDto _startingFactionApp;
+    private readonly List<ZoneSeedAppDto> _recordedZones = new();
+    private readonly List<UnitDefinitionAppDto> _unitDefinitions = new();
+    private readonly List<UnitAppDto> _deployedUnits = new();
+    private UnitAppDto _draggingUnitApp;
+    private List<DetectedLabelAppDto> _ocrLabels = new();
 
 
     private string _unitName = string.Empty;
@@ -275,8 +275,8 @@
             if (string.IsNullOrWhiteSpace(_model.Name)) list.Add("Operation Codename is missing.");
             if (!_hasMap) list.Add("Tactical Map must be uploaded.");
             if (_model.Factions.Count < 2) list.Add($"At least 2 Factions required (Current: {_model.Factions.Count}).");
-            if (_myFaction == null) list.Add("Select your Faction to COMMAND (Checkbox).");
-            if (_startingFaction == null) list.Add("Select Faction for 1ST TURN (Checkbox).");
+            if (_myFactionApp == null) list.Add("Select your Faction to COMMAND (Checkbox).");
+            if (_startingFactionApp == null) list.Add("Select Faction for 1ST TURN (Checkbox).");
             return list;
         }
     }
@@ -310,7 +310,7 @@
             _isScanning = true;
             StateHasChanged();
 
-            _ocrLabels = await JsRuntime.InvokeAsync<List<DetectedLabelDto>>("mapTools.scanMapText", _imageDataUrl);
+            _ocrLabels = await JsRuntime.InvokeAsync<List<DetectedLabelAppDto>>("mapTools.scanMapText", _imageDataUrl);
             Console.WriteLine($"OCR Success: Found {_ocrLabels.Count} regions.");
         }
         catch (Exception ex)
@@ -329,7 +329,7 @@
 
     private async Task HandleCanvasClick(MouseEventArgs e)
     {
-        if (_selectedFaction == null) return;
+        if (_selectedFactionApp == null) return;
 
         if (_currentTool == "PAINT")
         {
@@ -337,7 +337,7 @@
                 "mapTools.floodFill",
                 e.OffsetX,
                 e.OffsetY,
-                _selectedFaction.Color
+                _selectedFactionApp.Color
             );
 
             if (realCoords != null)
@@ -361,18 +361,18 @@
 
                 if (nearbyExistingZone != null)
                 {
-                    nearbyExistingZone.FactionName = _selectedFaction.Name;
+                    nearbyExistingZone.FactionName = _selectedFactionApp.Name;
                     nearbyExistingZone.X = realCoords.X;
                     nearbyExistingZone.Y = realCoords.Y;
                     nearbyExistingZone.Name = _regionName;
                 }
                 else
                 {
-                    _recordedZones.Add(new ZoneSeedDto
+                    _recordedZones.Add(new ZoneSeedAppDto
                     {
                         X = realCoords.X,
                         Y = realCoords.Y,
-                        FactionName = _selectedFaction.Name,
+                        FactionName = _selectedFactionApp.Name,
                         Name = _regionName
                     });
                 }
@@ -380,12 +380,12 @@
         }
         else if (_currentTool == "DEPLOY")
         {
-            if (string.IsNullOrEmpty(_selectedDefinitionId) && _draggingUnit != null) return;
+            if (string.IsNullOrEmpty(_selectedDefinitionId) && _draggingUnitApp != null) return;
 
-            _deployedUnits.Add(new UnitDto
+            _deployedUnits.Add(new UnitAppDto
             {
                 DefinitionId = _selectedDefinitionId,
-                FactionName = _selectedFaction.Name,
+                FactionName = _selectedFactionApp.Name,
                 X = e.OffsetX,
                 Y = e.OffsetY,
                 ExcelFileName = _pendingExcelName,
@@ -396,6 +396,7 @@
             _pendingExcelName = "";
         }
     }
+
     private async Task ResetMap()
     {
         await JsRuntime.InvokeVoidAsync("mapTools.resetMap");
@@ -408,13 +409,13 @@
             return;
         }
 
-        var gameState = new GameStateDto
+        var gameState = new GameStateAppDto
         {
             Factions = _model.Factions,
             Zones = _recordedZones,
             Units = _deployedUnits,
             UnitDefinitions = _unitDefinitions,
-            CurrentTurnFaction = _startingFaction.Name,
+            CurrentTurnFaction = _startingFactionApp.Name,
             TurnNumber = 1
         };
 
@@ -423,7 +424,7 @@
         using var content = new MultipartFormDataContent();
         content.Add(new StringContent(_model.Name), "Name");
         content.Add(new StringContent(jsonString), "GameStateJson");
-        content.Add(new StringContent(_myFaction.Name), "CreatorFactionName");
+        content.Add(new StringContent(_myFactionApp.Name), "CreatorFactionName");
 
         var imgContent = new ByteArrayContent(_fileBytes);
         imgContent.Headers.ContentType = new MediaTypeHeaderValue(_fileContentType);
@@ -458,7 +459,7 @@
 
         var base64 = Convert.ToBase64String(buffer);
 
-        var newDef = new UnitDefinitionDto
+        var newDef = new UnitDefinitionAppDto
         {
             Name = _unitName,
             ImageBase64 = $"data:image/png;base64,{base64}"
@@ -469,33 +470,33 @@
         _unitName = string.Empty;
     }
 
-    private void StartDrag(UnitDto unit)
+    private void StartDrag(UnitAppDto unitApp)
     {
         if (_currentTool == "DEPLOY")
         {
-            _draggingUnit = unit;
+            _draggingUnitApp = unitApp;
         }
     }
 
     private void HandleWrapperMouseMove(MouseEventArgs e)
     {
-        if (_draggingUnit != null)
+        if (_draggingUnitApp != null)
         {
-            _draggingUnit.X = e.OffsetX;
-            _draggingUnit.Y = e.OffsetY;
+            _draggingUnitApp.X = e.OffsetX;
+            _draggingUnitApp.Y = e.OffsetY;
         }
     }
 
     private void HandleWrapperMouseUp(MouseEventArgs e)
     {
-        _draggingUnit = null;
+        _draggingUnitApp = null;
     }
 
-    private void DeleteUnit(UnitDto unit)
+    private void DeleteUnit(UnitAppDto unitApp)
     {
         if (_currentTool == "DEPLOY")
         {
-            _deployedUnits.Remove(unit);
+            _deployedUnits.Remove(unitApp);
         }
     }
 
@@ -523,7 +524,7 @@
             return;
         }
 
-        var newFaction = new FactionDto
+        var newFaction = new FactionAppDto
         {
             Name = _factionName,
             Color = _factionColor
@@ -536,7 +537,7 @@
 
         if (_model.Factions.Count == 1)
         {
-            _selectedFaction = newFaction;
+            _selectedFactionApp = newFaction;
         }
 
         StateHasChanged();

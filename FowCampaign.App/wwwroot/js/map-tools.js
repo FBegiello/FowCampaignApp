@@ -7,7 +7,10 @@
     initMap: (canvasId, imageSrc) => {
         return new Promise((resolve) => {
             const canvas = document.getElementById(canvasId);
-            if (!canvas || !imageSrc) { resolve({width: 0, height: 0}); return; }
+            if (!canvas || !imageSrc) {
+                resolve({width: 0, height: 0});
+                return;
+            }
 
             const ctx = canvas.getContext('2d', {willReadFrequently: true});
             const img = new Image();
@@ -20,20 +23,23 @@
                 window.mapTools.canvas = canvas;
                 window.mapTools.ctx = ctx;
                 window.mapTools.img = img;
-                resolve({ width: img.width, height: img.height });
+                resolve({width: img.width, height: img.height});
             };
 
 
-            img.onerror = (err) => { console.error(err); resolve({width: 0, height: 0}); };
+            img.onerror = (err) => {
+                console.error(err);
+                resolve({width: 0, height: 0});
+            };
             img.src = imageSrc;
         });
     },
 
     getClientDimensions: (elementId) => {
         const el = document.getElementById(elementId);
-        if (!el) return { width: 1, height: 1 };
+        if (!el) return {width: 1, height: 1};
         const rect = el.getBoundingClientRect();
-        return { width: rect.width, height: rect.height };
+        return {width: rect.width, height: rect.height};
     },
 
     preprocessImageForOCR: (imageSrc) => {

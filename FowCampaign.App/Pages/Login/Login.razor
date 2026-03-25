@@ -5,7 +5,7 @@
 @using FowCampaign.App.Shared
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
-@inject LoginDto User
+@inject LoginAppDto User
 
 <div class="container">
     <PaperSheet @ref="_paper">
@@ -126,4 +126,5 @@
     {
         await _paper.TossAndNavigate("/register");
     }
+
 }

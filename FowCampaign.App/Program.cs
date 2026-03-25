@@ -13,7 +13,6 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 
-
 builder.Services.AddTransient<CookieHandler>();
 
 var apiUrl = builder.Configuration["ApiBaseUrl"] ?? builder.HostEnvironment.BaseAddress;
@@ -22,10 +21,10 @@ builder.Services.AddHttpClient("API", client => { client.BaseAddress = new Uri(a
     .AddHttpMessageHandler<CookieHandler>();
 
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("API"));
-builder.Services.AddSingleton<User>();
-builder.Services.AddScoped<LoginDto>();
-builder.Services.AddScoped<RegisterDto>();
-builder.Services.AddScoped<UserSessionDto>();
+builder.Services.AddSingleton<UserAppDto>();
+builder.Services.AddScoped<LoginAppDto>();
+builder.Services.AddScoped<RegisterAppDto>();
+builder.Services.AddScoped<UserSessionAppDto>();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 

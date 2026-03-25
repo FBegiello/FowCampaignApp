@@ -1,6 +1,6 @@
 namespace FowCampaign.App.DTO;
 
-public class BattleResultDto
+public class BattleResultAppDto
 {
     public string ZoneName { get; set; }
     public int TurnNumber { get; set; }
