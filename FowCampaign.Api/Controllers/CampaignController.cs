@@ -288,9 +288,8 @@ public class CampaignController : ControllerBase
         var battleJson = JsonSerializer.Serialize(new 
         { 
             battleResultDto.MajorPoints, 
-            battleResultDto.MinorPoints, 
-            battleResultDto.EliminatedUnitInfo,
-            
+            battleResultDto.MinorPoints,
+            battleResultDto.UpdatedUnitFiles
         });
         
 
@@ -304,6 +303,19 @@ public class CampaignController : ControllerBase
         };
         
         _context.BattleLogs.Add(newLog);
+
+
+        var state = JsonSerializer.Deserialize<GameStateDto>(campaign.GameStateJson);
+        if (state != null && battleResultDto.UpdatedUnitFiles.Any())
+        {
+            foreach (var unitFile in battleResultDto.UpdatedUnitFiles)
+            {
+                var targetUnits = state.Units.FirstOrDefault(u => u.Id == unitFile.Key);
+                if (targetUnits != null) targetUnits.ExcelDatabase64 = unitFile.Value;
+            }
+
+            campaign.GameStateJson = JsonSerializer.Serialize(state);
+        }
         await _context.SaveChangesAsync();
         
         return Ok(new { message = "Battle logged successfully" });

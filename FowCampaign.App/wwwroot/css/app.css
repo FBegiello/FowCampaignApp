@@ -330,7 +330,7 @@ body {
     font-family: 'Courier New', Courier, monospace;
     font-size: 1.2rem;
     font-weight: bold;
-    width: 50px;
+    width: inherit;
     padding: 5px;
     color: #000;
 }
@@ -340,6 +340,22 @@ body {
     border-bottom: 2px solid #bd2424;
 }
 
+.tactical-input-white {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #555;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.2rem;
+    font-weight: bold;
+    width: inherit;
+    padding: 5px;
+    color: #ffffff;
+}
+
+.tactical-input-white:focus {
+    outline: none;
+    border-bottom: 2px solid #bd2424;
+}
 
 .canvas-container {
     position: relative;
@@ -1366,5 +1382,272 @@ canvas {
         background: #d9c5a3;
         opacity: 1;
     }
+}
+
+/* --- ROSTER MODAL --- */
+.roster-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.roster-modal-content {
+    background: #1e1e1e;
+    border: 2px solid #555;
+    box-shadow: 0 0 20px black;
+    padding: 20px;
+    width: 85%;
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow-y: auto;
+    color: white;
+    font-family: 'Courier New', monospace;
+}
+
+.roster-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.roster-modal-title {
+    margin: 0;
+    font-family: 'Black Ops One', sans-serif;
+    color: #ddd;
+}
+
+.roster-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.roster-table th {
+    padding: 12px;
+    border-bottom: 1px solid #555;
+    background: #222;
+}
+
+.roster-table td {
+    padding: 12px;
+    border-bottom: 1px solid #333;
+}
+
+.roster-table-row {
+    transition: background 0.2s;
+}
+
+.roster-table-row:hover {
+    background: #2a2a2a;
+}
+
+.roster-unit-icon {
+    width: 32px;
+    vertical-align: middle;
+    margin-right: 15px;
+}
+
+/* --- EXCEL EDITOR (MODAL) --- */
+.excel-editor-container {
+    background: #111;
+    padding: 15px;
+    border: 1px solid #444;
+}
+
+.excel-editor-title {
+    color: #4caf50;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.excel-table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 15px;
+    max-height: 50vh;
+}
+
+.excel-grid-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.excel-grid-table td {
+    border: 1px solid #555;
+    padding: 0;
+}
+
+.excel-cell-input {
+    width: 100%;
+    min-width: 100px;
+    box-sizing: border-box;
+    background: #222;
+    color: #fff;
+    border: none;
+    font-family: 'Courier New', monospace;
+    padding: 8px;
+}
+
+.excel-cell-input:focus {
+    outline: 1px solid #4caf50;
+    background: #333;
+}
+
+.excel-editor-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.excel-editor-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.deployment-panel {
+    background: #222;
+    padding: 10px;
+    border: 1px dashed #555;
+    margin-bottom: 15px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.attached-file-label {
+    color: #4caf50;
+    font-size: 0.7rem;
+    margin-top: 5px;
+    text-align: center;
+    display: block;
+}
+
+.deployment-instruction {
+    font-size: 0.75rem;
+    color: #aaa;
+    text-align: center;
+    margin-top: 10px;
+    font-family: 'Courier New', monospace;
+    display: block;
+}
+
+.btn-open-roster {
+    background-color: #1a237e;
+    border-color: #3949ab;
+    color: white;
+    margin-bottom: 15px;
+}
+
+.btn-open-roster:hover {
+    background-color: #283593;
+}
+
+.btn-close-modal {
+    background: #8b0000;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-close-modal:hover {
+    background: #a00000;
+}
+
+.btn-edit-excel {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+}
+
+.btn-edit-excel:hover {
+    background: #388e3c;
+}
+
+.btn-excel-tool {
+    background: #444;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+}
+
+.btn-excel-tool:hover {
+    background: #555;
+}
+
+.btn-save-roster {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-save-roster:hover {
+    background: #388e3c;
+}
+
+.btn-cancel-roster {
+    background: #555;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.btn-cancel-roster:hover {
+    background: #666;
+}
+
+.btn-attach-excel {
+    background-color: #2e7d32;
+    color: white;
+    font-size: 0.8rem;
+    padding: 5px;
+    text-align: center;
+    display: block;
+    cursor: pointer;
+    width: fit-content;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-attach-excel:hover {
+    background-color: #388e3c;
+}
+
+.text-muted {
+    color: #aaa;
+}
+
+.text-dim {
+    color: #888;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.mb-5 {
+    margin-bottom: 5px;
 }
 
